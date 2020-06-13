@@ -39,14 +39,14 @@ internal class AppDatabase private constructor(context: Context): SQLiteOpenHelp
         TODO("Not yet implemented")
     }
 
-    companion object {
-
-        @Volatile
-        private var instance: AppDatabase? = null
-
-        fun getInstance(context: Context): AppDatabase =
-            instance ?: synchronized(this) {
-                instance ?: AppDatabase(context).also { instance = it }
-            }
-    }
+    companion object : SingletonHolder<AppDatabase, Context>(::AppDatabase)
+//    companion object {
+//        @Volatile
+//        private var instance: AppDatabase? = null
+//
+//        fun getInstance(context: Context): AppDatabase =
+//            instance ?: synchronized(this) {
+//                instance ?: AppDatabase(context).also { instance = it }
+//            }
+//    }
 }
