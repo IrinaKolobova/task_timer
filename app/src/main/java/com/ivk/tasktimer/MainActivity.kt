@@ -17,20 +17,23 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        val appDatabase = AppDatabase.getInstance(this)
-        val db = appDatabase.readableDatabase
-
-        val cursor = db.rawQuery("SELECT * FROM Tasks", null)
+        val projection = arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
+        val sortColumn = TasksContract.Columns.TASK_SORT_ORDER
+        val cursor = contentResolver.query(TasksContract.buildUriFromId(2),
+            projection,
+            null,
+            null,
+            sortColumn)
         Log.d(TAG, "*********************************")
-        cursor.use {
+        cursor?.use {
             while (it.moveToNext()) {
                 // cycle through all records
                 with(cursor) {
-                    val id = getLong(0)
-                    val name = getString(1)
-                    val description = getString(2)
-                    val sortOrder = getString(3)
-                    val result = "ID: $id. Name: $name. Description: $description. Sort order: $sortOrder"
+                    //val id = getLong(0)
+                    val name = getString(0)
+                    //val description = getString(2)
+                    val sortOrder = getString(1)
+                    val result = "Name: $name. Sort order: $sortOrder"
                     Log.d(TAG, "onCreate: reading data $result")
                 }
             }
