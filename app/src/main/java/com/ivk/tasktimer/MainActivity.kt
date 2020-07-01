@@ -18,7 +18,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        testInsert()
+        //testInsert()
+        //testUpdate()
+        testUpdateTwo()
 
         val projection = arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
         val sortColumn = TasksContract.Columns.TASK_SORT_ORDER
@@ -50,6 +52,34 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
+    }
+
+    private fun testUpdateTwo() {
+        val values = ContentValues().apply {
+            put(TasksContract.Columns.TASK_SORT_ORDER, 999)
+            put(TasksContract.Columns.TASK_DESCRIPTION, "For deletion")
+        }
+
+        val selection = TasksContract.Columns.TASK_SORT_ORDER + " = ?"
+        val selectionArgs = arrayOf("99")
+
+        //val taskUri = TasksContract.buildUriFromId(4)
+        val rowAffected = contentResolver.update(TasksContract.CONTENT_URI,
+            values,
+            selection,
+            selectionArgs)
+        Log.d(TAG, "Number of rows updated is $rowAffected")
+    }
+
+    private fun testUpdate() {
+        val values = ContentValues().apply {
+            put(TasksContract.Columns.TASK_NAME, "Content Provider")
+            put(TasksContract.Columns.TASK_DESCRIPTION, "Record content provider videos")
+        }
+
+        val taskUri = TasksContract.buildUriFromId(4)
+        val rowAffected = contentResolver.update(taskUri, values, null, null)
+        Log.d(TAG, "Number of rows updated is $rowAffected")
     }
 
     private fun testInsert() {
