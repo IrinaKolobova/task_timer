@@ -20,7 +20,9 @@ class MainActivity : AppCompatActivity() {
 
         //testInsert()
         //testUpdate()
-        testUpdateTwo()
+        //testUpdateTwo()
+        //testDelete()
+        testDeleteTwo()
 
         val projection = arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
         val sortColumn = TasksContract.Columns.TASK_SORT_ORDER
@@ -53,6 +55,24 @@ class MainActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
         }
     }
+
+    private fun testDeleteTwo() {
+
+        val selection = TasksContract.Columns.TASK_DESCRIPTION + " = ?"
+        val selectionArgs = arrayOf("For deletion")
+        val rowAffected = contentResolver.delete(TasksContract.CONTENT_URI,
+            selection,
+            selectionArgs)
+        Log.d(TAG, "Number of rows deleted is $rowAffected")
+    }
+
+    private fun testDelete() {
+
+        val taskUri = TasksContract.buildUriFromId(3)
+        val rowAffected = contentResolver.delete(taskUri, null, null)
+        Log.d(TAG, "Number of rows deleted is $rowAffected")
+    }
+
 
     private fun testUpdateTwo() {
         val values = ContentValues().apply {
