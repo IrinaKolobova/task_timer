@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Number of rows deleted is $rowAffected")
     }
 
-
     private fun testUpdateTwo() {
         val values = ContentValues().apply {
             put(TasksContract.Columns.TASK_SORT_ORDER, 999)
@@ -125,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.menumain_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
     }

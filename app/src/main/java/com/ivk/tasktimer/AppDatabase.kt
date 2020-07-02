@@ -15,7 +15,7 @@ import java.lang.IllegalStateException
 private const val TAG = "AppDatabase"
 
 private const val DATABASE_NAME = "TaskTimer.db"
-private const val DATABASE_VERSION = 1
+private const val DATABASE_VERSION = 3
 
 internal class AppDatabase private constructor(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
