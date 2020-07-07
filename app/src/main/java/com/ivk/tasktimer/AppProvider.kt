@@ -111,13 +111,12 @@ class AppProvider: ContentProvider() {
         }
 
         val context = context ?: throw NullPointerException("In query function.  Context can't be null here!")
-        val db = AppDatabase.getInstance(context!!).readableDatabase
+        val db = AppDatabase.getInstance(context).readableDatabase
         val cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder)
         Log.d(TAG, "query: rows in returned cursor = ${cursor.count}")
 
         return cursor
     }
-
 
     override fun insert(uri: Uri, values: ContentValues?): Uri {
         Log.d(TAG, "insert: called with uri $uri")
@@ -262,7 +261,7 @@ class AppProvider: ContentProvider() {
             else -> throw IllegalArgumentException("Unknown uri: $uri")
         }
 
-        Log.d(TAG, "Exiting update, returning $count")
+        Log.d(TAG, "Exiting delete, returning $count")
         return count
     }
 }

@@ -31,7 +31,7 @@ internal class AppDatabase private constructor(context: Context): SQLiteOpenHelp
             ${TasksContract.Columns.TASK_NAME} TEXT NOT NULL,
             ${TasksContract.Columns.TASK_DESCRIPTION} TEXT,
             ${TasksContract.Columns.TASK_SORT_ORDER} INTEGER);
-        """.replaceIndent("")
+        """.replaceIndent("  ")
         Log.d(TAG, sSQL)
         db.execSQL(sSQL)
     }
