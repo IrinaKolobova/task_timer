@@ -60,9 +60,7 @@ class AppProvider: ContentProvider() {
 
     override fun getType(uri: Uri): String? {
 
-        val match = uriMatcher.match(uri)
-
-        return when (match) {
+        return when (uriMatcher.match(uri)) {
             TASKS -> TasksContract.CONTENT_TYPE
 
             TASKS_ID -> TasksContract.CONTENT_ITEM_TYPE

@@ -129,7 +129,7 @@ class AddEditFragment : Fragment() {
         if (context is OnSaveClicked) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnSaveClicked")
+            throw RuntimeException("$context must implement OnSaveClicked")
         }
     }
 
