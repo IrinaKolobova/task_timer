@@ -25,7 +25,7 @@
         android:autofillHints="" />
 
     <EditText
-        android:id="@+id/addedit_sort_order"
+        android:id="@+id/addedit_sortorder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"

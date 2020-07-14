@@ -1,6 +1,7 @@
 package com.ivk.tasktimer
 
 import android.app.Application
+import android.content.ContentValues
 import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
@@ -51,6 +52,35 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
             )
             databaseCursor.postValue(cursor)
         }
+    }
+
+    fun saveTask(task: Task): Task {
+        val values = ContentValues()
+
+        if (task.name.isNotEmpty()) {
+            // Don't save a task with no name
+            values.put(TasksContract.Columns.TASK_NAME, task.name)
+            values.put(TasksContract.Columns.TASK_DESCRIPTION, task.description)
+            values.put(TasksContract.Columns.TASK_SORT_ORDER, task.sortOrder)   //defaults to zero if empty
+
+            if (task.id == 0L) {
+                GlobalScope.launch {
+                    Log.d(TAG, "saveTask: adding new task")
+                    val uri = getApplication<Application>().contentResolver?.insert(TasksContract.CONTENT_URI, values)
+                    if (uri != null) {
+                        task.id = TasksContract.getId(uri)
+                        Log.d(TAG, "saveTAsk: new id is ${task.id}")
+                    }
+                }
+            } else {
+                // task has an id, so we're updating
+                GlobalScope.launch {
+                    Log.d(TAG,"saveTAsk: updating task")
+                    getApplication<Application>().contentResolver?.update(TasksContract.buildUriFromId(task.id), values, null, null)
+                }
+            }
+        }
+        return task
     }
 
     fun deleteTask(taskId: Long) {
