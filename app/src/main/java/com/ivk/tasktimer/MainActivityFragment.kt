@@ -12,16 +12,20 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.lang.AssertionError
 import java.lang.RuntimeException
 
 /**
  * A placeholder fragment containing a simple view.
  */
 private const val TAG = "MainActivityFragment"
+private const val DIALOG_ID_DELETE = 1
+private const val DIALOG_TASK_ID = "task_id"
 
 @SuppressLint("UseRequireInsteadOfGet")
 class MainActivityFragment : Fragment(),
-CursorRecyclerViewAdapter.OnTaskClickListener {
+        CursorRecyclerViewAdapter.OnTaskClickListener,
+        AppDialog.DialogEvents {
 
     interface OnTaskEdit {
         fun onTaskEdit(task: Task)
@@ -64,10 +68,29 @@ CursorRecyclerViewAdapter.OnTaskClickListener {
     }
 
     override fun onDeleteClick(task: Task) {
-        viewModel.deleteTask(task.id)
+        val args = Bundle().apply {
+            putInt(DIALOG_ID, DIALOG_ID_DELETE)
+            putString(DIALOG_MESSAGE, getString(R.string.deldiag_message, task.id, task.name))
+            putInt(DIALOG_POSITIVE_RID, R.string.deldiag_positive_caption)
+            putLong(DIALOG_TASK_ID, task.id)    // pass the id in the arguments, so we can retrieve it when we get called back
+        }
+        val dialog = AppDialog()
+        dialog.arguments = args
+        dialog.show(childFragmentManager, null)
+        dialog.show(childFragmentManager, null)
     }
 
     override fun onTaskLongClick(task: Task) {
         TODO("Not yet implemented")
+    }
+
+    override fun onPositiveDialogResult(dialogId: Int, args: Bundle) {
+        Log.d(TAG, "onPositiveDialogResult: called with id $dialogId")
+
+        if (dialogId == DIALOG_ID_DELETE) {
+            val taskId = args.getLong(DIALOG_TASK_ID)
+            if (BuildConfig.DEBUG && taskId == 0L) throw AssertionError("Task ID is zero")
+            viewModel.deleteTask(taskId)
+        }
     }
 }
