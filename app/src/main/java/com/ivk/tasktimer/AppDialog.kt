@@ -86,7 +86,7 @@ class AppDialog : AppCompatDialogFragment() {
                 negativeStingId = R.string.cancel
             }
         } else {
-            throw IllegalArgumentException("Must apss DIALOG_ID and DIALOG_MESSAGE in the bundle")
+            throw IllegalArgumentException("Must pass DIALOG_ID and DIALOG_MESSAGE in the bundle")
         }
 
         return builder.setMessage(messageString)
@@ -113,10 +113,5 @@ class AppDialog : AppCompatDialogFragment() {
         Log.d(TAG, "onCancel called")
         val dialogId = requireArguments().getInt(DIALOG_ID)
 //        dialogEvents?.onDialogCancelled(dialogId)
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        Log.d(TAG, "onDismiss called")
-        super.onDismiss(dialog)     // <-- comment out this line, for strange results
     }
 }

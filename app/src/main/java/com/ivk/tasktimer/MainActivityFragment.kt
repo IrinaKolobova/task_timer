@@ -77,7 +77,6 @@ class MainActivityFragment : Fragment(),
         val dialog = AppDialog()
         dialog.arguments = args
         dialog.show(childFragmentManager, null)
-        dialog.show(childFragmentManager, null)
     }
 
     override fun onTaskLongClick(task: Task) {

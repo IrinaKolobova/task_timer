@@ -75,6 +75,15 @@ class AddEditFragment : Fragment() {
         return newTask
     }
 
+    fun isDirty(): Boolean {
+        val newTask = taskFromUI()
+        return ((newTask != task) &&
+                (newTask.name.isNotBlank()
+                || newTask.description.isNotBlank()
+                || newTask.sortOrder != 0)
+        )
+    }
+
     private fun saveTask() {
         // Create a newtask object with the details to be saved, then
         // call the viewModel's saveTask function to save it.
