@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -21,6 +23,9 @@ class MainActivity : AppCompatActivity(),
     // Whether or not the activity is in 2-pane mode
     // i.e. running in landscape, or on a tablet
     private var mTwoPane = false
+
+    // module scope because we need to dismiss it in onStop (e.g. when orientation changes) to avoid memory leaks
+    private var aboutDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -82,6 +87,7 @@ class MainActivity : AppCompatActivity(),
         when (item.itemId) {
             R.id.menumain_addTask -> taskEditRequest(null)
             //R.id.menumain_settings -> true
+            R.id.menumain_showAbout -> showAboutDialog()
             android.R.id.home -> {
                 Log.d(TAG, "onOptionsItemSelected: home button pressed")
                 val fragment = findFragmentById(R.id.task_details_container)
@@ -97,6 +103,30 @@ class MainActivity : AppCompatActivity(),
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showAboutDialog() {
+        val messageView = layoutInflater.inflate(R.layout.about, null, false)
+        val builder = AlertDialog.Builder(this)
+
+        builder.setTitle(R.string.app_name)
+        builder.setIcon(R.mipmap.ic_launcher)
+
+        builder.setPositiveButton(R.string.ok) { _, _ ->
+            Log.d(TAG, "onClick: Entering messageView.onClick")
+            if (aboutDialog != null && aboutDialog?.isShowing == true) {
+                aboutDialog?.dismiss()
+            }
+        }
+
+        aboutDialog = builder.setView(messageView).create()
+        aboutDialog?.setCanceledOnTouchOutside(true)
+
+        val aboutVersion = messageView.findViewById(R.id.about_version) as TextView
+        aboutVersion.text = BuildConfig.VERSION_NAME
+//        about_version.text = BuildConfig.VERSION_NAME  <- synthetic import! code will compile but it will crush
+
+        aboutDialog?.show()
     }
 
     override fun onTaskEdit(task: Task) {
@@ -138,6 +168,14 @@ class MainActivity : AppCompatActivity(),
         Log.d(TAG, "onPositiveDialogResult: called with dialogId $dialogId")
         if (dialogId == DIALOG_ID_CANCEL_EDIT) {
             removeEditPane(findFragmentById(R.id.task_details_container))
+        }
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "onStop: called")
+        super.onStop()
+        if (aboutDialog?.isShowing == true) {
+            aboutDialog?.dismiss()
         }
     }
 }
