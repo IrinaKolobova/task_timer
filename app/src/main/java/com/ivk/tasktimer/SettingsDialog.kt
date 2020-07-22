@@ -1,6 +1,5 @@
 package com.ivk.tasktimer
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.util.Log
@@ -31,6 +30,7 @@ class SettingsDialog: AppCompatDialogFragment() {
         Log.d(TAG, "onCreate: called")
         super.onCreate(savedInstanceState)
         setStyle(AppCompatDialogFragment.STYLE_NORMAL, R.style.SettingsDialogStyle)
+        retainInstance = true
     }
 
     override fun onCreateView(
@@ -91,30 +91,36 @@ class SettingsDialog: AppCompatDialogFragment() {
         Log.d(TAG, "onViewStateRestored: called")
 
         super.onViewStateRestored(savedInstanceState)
-        readValues()
+        if (savedInstanceState == null) {
+            readValues()
 
-        firstDaySpinner.setSelection(firstDay - GregorianCalendar.SUNDAY)   //spinner values are zero-based
+            firstDaySpinner.setSelection(firstDay - GregorianCalendar.SUNDAY)   //spinner values are zero-based
 
-        //convert seconds into an index into the time values array
-        val seekBarValue = deltas.binarySearch(ignoreLessThan)
-        if (seekBarValue < 0) {
-            // this shouldn't happen, the programmer's made a mistake
-            throw IndexOutOfBoundsException("Value $seekBarValue not found in deltas array")
-        }
+            //convert seconds into an index into the time values array
+            val seekBarValue = deltas.binarySearch(ignoreLessThan)
+            if (seekBarValue < 0) {
+                // this shouldn't happen, the programmer's made a mistake
+                throw IndexOutOfBoundsException("Value $seekBarValue not found in deltas array")
+            }
 
-        ignoreSeconds.max = deltas.size - 1
-        Log.d(TAG, "onViewStateRestored: setting slider to $seekBarValue")
-        ignoreSeconds.progress = seekBarValue
+            ignoreSeconds.max = deltas.size - 1
+            Log.d(TAG, "onViewStateRestored: setting slider to $seekBarValue")
+            ignoreSeconds.progress = seekBarValue
 
-        if (ignoreLessThan < 60) {
-            ignoreSecondsTitle.text = getString(R.string.settingsIgnoreSecondsTitle,
-                ignoreLessThan,
-                resources.getQuantityString(R.plurals.settingsLittleUnits, ignoreLessThan))
-        } else {
-            val minutes = ignoreLessThan / 60
-            ignoreSecondsTitle.text = getString(R.string.settingsIgnoreSecondsTitle,
-                minutes,
-                resources.getQuantityString(R.plurals.settingsBigUnits, minutes))
+            if (ignoreLessThan < 60) {
+                ignoreSecondsTitle.text = getString(
+                    R.string.settingsIgnoreSecondsTitle,
+                    ignoreLessThan,
+                    resources.getQuantityString(R.plurals.settingsLittleUnits, ignoreLessThan)
+                )
+            } else {
+                val minutes = ignoreLessThan / 60
+                ignoreSecondsTitle.text = getString(
+                    R.string.settingsIgnoreSecondsTitle,
+                    minutes,
+                    resources.getQuantityString(R.plurals.settingsBigUnits, minutes)
+                )
+            }
         }
     }
 
@@ -133,5 +139,10 @@ class SettingsDialog: AppCompatDialogFragment() {
             }
             apply()
         }
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "onDestroy: called")
+        super.onDestroy()
     }
 }
