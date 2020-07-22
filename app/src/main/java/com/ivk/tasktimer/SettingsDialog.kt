@@ -27,6 +27,12 @@ class SettingsDialog: AppCompatDialogFragment() {
     private var firstDay = defaultFirstDayOfWeek
     private var ignoreLessThan = SETTINGS_DEFAULT_IGNORE_LESS_THAN
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: called")
+        super.onCreate(savedInstanceState)
+        setStyle(AppCompatDialogFragment.STYLE_NORMAL, R.style.SettingsDialogStyle)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,6 +45,9 @@ class SettingsDialog: AppCompatDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated: called")
         super.onViewCreated(view, savedInstanceState)
+
+        dialog?.setTitle(R.string.action_settings)
+
         okButton.setOnClickListener{
             saveValues()
             dismiss()
