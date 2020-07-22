@@ -29,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:ems="35"
         android:text="@string/settingsIgnoreSecondsTitle"
         android:textColor="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
