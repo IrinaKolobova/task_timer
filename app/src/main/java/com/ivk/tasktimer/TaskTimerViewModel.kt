@@ -31,10 +31,16 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
     val cursor: LiveData<Cursor>
     get() = databaseCursor
 
+    private val taskTiming = MutableLiveData<String>()
+    val timing: LiveData<String>
+        get() = taskTiming
+
     init {
         Log.d(TAG, "TaskTimerViewModel: created")
         getApplication<Application>().contentResolver.registerContentObserver(TasksContract.CONTENT_URI,
                 true, contentObserver)
+
+        currentTiming = retrieveTiming()
         loadTasks()
     }
 
@@ -117,6 +123,9 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
                 currentTiming = newTiming
             }
         }
+
+        // Update the LiveData
+        taskTiming.value = if (currentTiming != null) task.name else null
     }
 
     private fun saveTiming(currentTiming: Timing) {
@@ -143,6 +152,38 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
                 getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.taskId), values, null, null)
             }
         }
+    }
+
+    private fun retrieveTiming(): Timing? {
+        Log.d(TAG, "retrieveTiming: starts")
+        val timing: Timing?
+
+        val timingCursor: Cursor? = getApplication<Application>().contentResolver.query(
+            CurrentTimingContract.CONTENT_URI,
+            null,   // passing null for the projection returns all columns
+            null,
+            null,
+            null)
+
+        if (timingCursor != null && timingCursor.moveToFirst()) {
+            // We have an un_timed record
+            val id = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TIMING_ID))
+            val taskId = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_ID))
+            val startTime = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.START_TIME))
+            val name = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_NAME))
+            timing = Timing(taskId, startTime, id)
+
+            // Update the LiveData
+            taskTiming.value = name.toString()
+        } else {
+            // No timing record found with zero duration
+            timing = null
+        }
+
+        timingCursor?.close()
+
+        Log.d(TAG, "retrieveTiming: returning")
+        return timing
     }
 
     override fun onCleared() {

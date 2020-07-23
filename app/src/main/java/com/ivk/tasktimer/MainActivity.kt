@@ -14,7 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.fragment_main.*
 
 private const val TAG = "MainActivity"
 private const val DIALOG_ID_CANCEL_EDIT = 1
@@ -30,6 +33,8 @@ class MainActivity : AppCompatActivity(),
 
     // module scope because we need to dismiss it in onStop (e.g. when orientation changes) to avoid memory leaks
     private var aboutDialog: AlertDialog? = null
+
+    private val viewModel by lazy { ViewModelProviders.of(this).get(TaskTimerViewModel::class.java)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -47,6 +52,15 @@ class MainActivity : AppCompatActivity(),
             task_details_container.visibility = if (mTwoPane) View.INVISIBLE else View.GONE
             mainFragment.view?.visibility = View.VISIBLE
         }
+
+        viewModel.timing.observe(this, Observer { timing ->
+            current_task.text = if (timing != null) {
+                getString(R.string.timing_message, timing)
+            } else {
+                getString(R.string.no_task_message)
+            }
+        })
+
         Log.d(TAG, "onCreate: finished")
     }
 
