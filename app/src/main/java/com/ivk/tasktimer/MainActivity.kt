@@ -96,6 +96,12 @@ class MainActivity : AppCompatActivity(),
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
+
+        if (BuildConfig.DEBUG) {
+            val generate = menu.findItem(R.id.menumain_generate)
+            generate.isVisible = true
+        }
+
         return true
     }
 
@@ -110,6 +116,7 @@ class MainActivity : AppCompatActivity(),
                 dialog.show(supportFragmentManager, null)
             }
             R.id.menumain_showAbout -> showAboutDialog()
+            R.id.menumain_generate -> TestData.generateTestData(contentResolver)
             android.R.id.home -> {
                 Log.d(TAG, "onOptionsItemSelected: home button pressed")
                 val fragment = findFragmentById(R.id.task_details_container)
