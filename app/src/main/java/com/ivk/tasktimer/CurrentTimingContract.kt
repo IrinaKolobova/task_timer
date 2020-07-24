@@ -1,8 +1,6 @@
 package com.ivk.tasktimer
 
-import android.content.ContentUris
 import android.net.Uri
-import android.provider.BaseColumns
 
 object CurrentTimingContract {
 
