@@ -41,7 +41,7 @@ class DatePickerFragment : AppCompatDialogFragment(), DatePickerDialog.OnDateSet
         val month = cal.get(GregorianCalendar.MONTH)
         val day = cal.get(GregorianCalendar.DAY_OF_MONTH)
 
-        val dpd = DatePickerDialog(requireContext(), this, year, month, day)
+        val dpd = UnbuggyDatePickerDialog(requireContext(), this, year, month, day)
         if (title != null) {
             dpd.setTitle(title)
         }
