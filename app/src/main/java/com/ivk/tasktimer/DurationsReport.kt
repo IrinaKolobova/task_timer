@@ -1,6 +1,9 @@
 package com.ivk.tasktimer
 
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -18,6 +21,7 @@ class DurationsReport : AppCompatActivity(),
     private val reportAdapter by lazy { DurationsRVAdapter(this, null) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_durations_report)
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -34,15 +38,54 @@ class DurationsReport : AppCompatActivity(),
         td_description_heading?.setOnClickListener(this)    // description will not be present in portrait
         td_start_heading.setOnClickListener(this)
         td_duration_heading.setOnClickListener(this)
+        Log.d(TAG, "onCreate: finished")
     }
 
     override fun onClick(v: View) {
+        Log.d(TAG, "onClick: called")
         when (v.id) {
             R.id.td_name_heading -> viewModel.sortOrder = SortColumns.NAME
             R.id.td_description_heading -> viewModel.sortOrder = SortColumns.DESCRIPTION
             R.id.td_start_heading -> viewModel.sortOrder = SortColumns.START_DATE
             R.id.td_duration_heading -> viewModel.sortOrder = SortColumns.DURATION
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        Log.d(TAG, "onCreateOptionsMenu: called")
+        menuInflater.inflate(R.menu.menu_report, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected: called")
+        val id = item.itemId
+        when (id) {
+            R.id.rm_filter_period -> {
+                viewModel.toggleDisplayWeek() // was showing a week, so now show a day - or vice versa
+                invalidateOptionsMenu() // force cal to onPrepareOptionsMenu to redraw our changed menu
+                return true
+            }
+            R.id.rm_filter_date -> {}
+            R.id.rm_delete -> {}
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        Log.d(TAG, "onPrepareOptionsMenu: called")
+        val item = menu.findItem(R.id.rm_filter_period)
+        if (item != null) {
+            // switch icon and title to represent 7 days or 1 day, as appropriate to the future function of the menu item.
+            if (viewModel.displayWeek) {
+                item.setIcon(R.drawable.ic_baseline_filter_1_24)
+                item.setTitle(R.string.rm_title_filter_day)
+            } else {
+                item.setIcon(R.drawable.ic_baseline_filter_7_24)
+                item.setTitle(R.string.rm_title_filter_week)
+            }
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     //    override fun onDestroy() {
