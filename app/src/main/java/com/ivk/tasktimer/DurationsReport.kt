@@ -1,19 +1,26 @@
 package com.ivk.tasktimer
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.task_durations.*
+import java.lang.IllegalArgumentException
 
 private const val TAG = "DurationsReport"
 
+private const val DIALOG_FILTER = 1
+private const val DIALOG_DELETE = 2
+
 class DurationsReport : AppCompatActivity(),
+    DatePickerDialog.OnDateSetListener,
     View.OnClickListener {
 
     private val viewModel by lazy { ViewModelProviders.of(this).get(DurationsViewModel::class.java) }
@@ -66,7 +73,10 @@ class DurationsReport : AppCompatActivity(),
                 invalidateOptionsMenu() // force cal to onPrepareOptionsMenu to redraw our changed menu
                 return true
             }
-            R.id.rm_filter_date -> {}
+            R.id.rm_filter_date -> {
+                showDatePickerDialog(getString(R.string.date_title_filter), DIALOG_FILTER)
+                return true
+            }
             R.id.rm_delete -> {}
         }
         return super.onOptionsItemSelected(item)
@@ -86,6 +96,31 @@ class DurationsReport : AppCompatActivity(),
             }
         }
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun showDatePickerDialog(title: String, dialogId: Int) {
+        val dialogFragment = DatePickerFragment()
+
+        val arguments = Bundle()
+        arguments.putInt(DATE_PICKER_ID, dialogId)
+        arguments.putString(DATE_PICKER_TITLE, title)
+        arguments.putSerializable(DATE_PICKER_DATE, viewModel.getFilterDate())
+        dialogFragment.arguments = arguments
+        dialogFragment.show(supportFragmentManager, "datePicker")
+    }
+
+    override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
+        Log.d(TAG, "onDateSet: called")
+
+        // Check the id, so we know what to do with the result
+        val dialogId = view.tag as Int
+        when (dialogId) {
+            DIALOG_FILTER -> {
+                viewModel.setReportDate(year,month, dayOfMonth)
+            }
+            DIALOG_DELETE -> {}
+            else -> throw IllegalArgumentException("Invalid mode when receiving DatePickerDialog result")
+        }
     }
 
     //    override fun onDestroy() {
