@@ -24,7 +24,7 @@ fun FragmentActivity.showConfirmationDialog(id: Int,
 
     val dialog = AppDialog()
     dialog.arguments = args
-    dialog.show(supportFragmentManager, null)
+    dialog.show(this.supportFragmentManager, null)
 }
 
 /**

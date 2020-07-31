@@ -67,7 +67,7 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?, private val listene
                 throw IllegalArgumentException("Couldn't move cursor to position $position")
             }
 
-            // Create a task object from the data in the cursor
+            // Create a Task object from the data in the cursor
             val task = Task(
                 cursor.getString(cursor.getColumnIndex(TasksContract.Columns.TASK_NAME)),
                 cursor.getString(cursor.getColumnIndex(TasksContract.Columns.TASK_DESCRIPTION)),
@@ -101,8 +101,8 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?, private val listene
      * If the given new Cursor is the same instance as the previously set Cursor,
      * null is also returned.
      */
-    fun swapCursor(newCursor: Cursor?) : Cursor? {
-        if (newCursor == cursor) {
+    fun swapCursor(newCursor: Cursor?): Cursor? {
+        if (newCursor === cursor) {
             return null
         }
         val numItems = itemCount

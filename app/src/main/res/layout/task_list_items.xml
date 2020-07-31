@@ -18,7 +18,7 @@
         app:layout_constraintEnd_toStartOf="@+id/tli_edit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="TaskTimer Aplication" />
+        tools:text="TaskTimer Application"/>
 
     <TextView
         android:id="@+id/tli_description"
@@ -31,7 +31,7 @@
         app:layout_constraintEnd_toStartOf="@+id/tli_edit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tli_name"
-        tools:text="Write course notes and video for the TaskTimer Application" />
+        tools:text="Write course notes and video for the TaskTimer application"/>
 
     <ImageButton
         android:id="@+id/tli_edit"
@@ -41,7 +41,7 @@
         android:contentDescription="@string/edit_button_description"
         app:layout_constraintEnd_toStartOf="@+id/tli_delete"
         app:layout_constraintTop_toTopOf="@+id/tli_delete"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
+        app:srcCompat="@android:drawable/ic_menu_edit"/>
 
     <ImageButton
         android:id="@+id/tli_delete"
@@ -52,5 +52,5 @@
         android:contentDescription="@string/delete_button_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
+        app:srcCompat="@android:drawable/ic_menu_delete"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

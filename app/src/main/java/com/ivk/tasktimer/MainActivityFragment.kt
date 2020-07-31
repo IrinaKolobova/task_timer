@@ -34,12 +34,6 @@ class MainActivityFragment : Fragment(),
     private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
     private val mAdapter = CursorRecyclerViewAdapter(null, this)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "onCreate: called")
-        super.onCreate(savedInstanceState)
-        viewModel.cursor.observe(this, Observer { cursor -> mAdapter.swapCursor(cursor)?.close() })
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView: called")
@@ -51,8 +45,14 @@ class MainActivityFragment : Fragment(),
         super.onAttach(context)
 
         if (context !is OnTaskEdit) {
-            throw RuntimeException("${context.toString()} must implement onTaskEdit")
+            throw RuntimeException("$context must implement OnTaskEdit")
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: called")
+        super.onCreate(savedInstanceState)
+        viewModel.cursor.observe(this, Observer { cursor -> mAdapter.swapCursor(cursor)?.close()})
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

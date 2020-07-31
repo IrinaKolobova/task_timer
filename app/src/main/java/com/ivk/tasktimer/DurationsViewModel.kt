@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.StringReader
 import java.util.*
 
 private const val TAG = "DurationsViewModel"
@@ -57,7 +56,7 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
     }
 
     fun setReportDate(year: Int, month: Int, dayOfMonth: Int) {
-        // check if the date was changed
+        // check if the date has changed
         if (calendar.get(GregorianCalendar.YEAR) != year
             || calendar.get(GregorianCalendar.MONTH) != month
             || calendar.get(GregorianCalendar.DAY_OF_MONTH) != dayOfMonth) {
@@ -67,28 +66,28 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
     }
 
     private fun applyFilter() {
-        Log.d(TAG, "entering applyFilter")
+        Log.d(TAG, "Entering applyFilter")
 
         val currentCalendarDate = calendar.timeInMillis // store the time, so we can put it back
 
         if (displayWeek) {
             // show records for the entire week
 
-            // we have a date, so find out which day of week it is
+            // we have a date, so find out which day of the week it is
             val weekStart = calendar.firstDayOfWeek
             Log.d(TAG, "applyFilter: first day of calendar week is $weekStart")
             Log.d(TAG, "applyFilter: dayOfWeek is ${calendar.get(GregorianCalendar.DAY_OF_WEEK)}")
-            Log.d(TAG, "applyFilter: date is" + calendar.time)
+            Log.d(TAG, "applyFilter: date is " + calendar.time)
 
             // calculate week start and end dates
             calendar.set(GregorianCalendar.DAY_OF_WEEK, weekStart)
-            calendar.set(GregorianCalendar.HOUR_OF_DAY, 0)
+            calendar.set(GregorianCalendar.HOUR_OF_DAY, 0)  // Note: HOUR_OF DAY, not HOUR !!!
             calendar.set(GregorianCalendar.MINUTE, 0)
             calendar.set(GregorianCalendar.SECOND, 0)
             val startDate = calendar.timeInMillis / 1000
 
-            // move forward 6 days to get to the last day of week
-            calendar.set(GregorianCalendar.DATE, 6)
+            // move forward 6 days to get to the last day of the week.
+            calendar.add(GregorianCalendar.DATE, 6)
             calendar.set(GregorianCalendar.HOUR_OF_DAY, 23)
             calendar.set(GregorianCalendar.MINUTE, 59)
             calendar.set(GregorianCalendar.SECOND, 59)
@@ -136,5 +135,22 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
                 order)
             databaseCursor.postValue(cursor)
         }
+    }
+
+    fun deleteRecords(timeInMilliseconds: Long) {
+        // clear all records from Timings table prior to the date selected
+        Log.d(TAG, "Entering deleteRecords")
+
+        val longDate = timeInMilliseconds / 1000    // we need time in seconds not millis.
+        val selectionArgs = arrayOf(longDate.toString())
+        val selection = "${TimingsContract.Columns.TIMING_START_TIME} < ?"
+
+        Log.d(TAG, "Deleting records prior to $longDate")
+
+        GlobalScope.launch {
+            getApplication<Application>().contentResolver.delete(TimingsContract.CONTENT_URI, selection, selectionArgs)
+        }
+
+        Log.d(TAG, "Exiting deleteRecords")
     }
 }

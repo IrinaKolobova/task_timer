@@ -34,10 +34,8 @@ class AddEditFragment : Fragment() {
         task = arguments?.getParcelable(ARG_TASK)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView: starts")
 
         // Inflate the layout for this fragment
@@ -54,9 +52,9 @@ class AddEditFragment : Fragment() {
                 Log.d(TAG, "onViewCreated: Task details found, editing task ${task.id}")
                 addedit_name.setText(task.name)
                 addedit_description.setText(task.description)
-                addedit_sortorder.setText(Integer.toString(task.sortOrder))
+                addedit_sortorder.setText(task.sortOrder.toString())
             } else {
-                // No task, so we must be ading a new task, and editing an existing one
+                // No task, so we must be adding a new task, and NOT editing an existing one
                 Log.d(TAG, "onViewCreated: No arguments, adding new record")
             }
         }
@@ -88,7 +86,7 @@ class AddEditFragment : Fragment() {
         // Create a newtask object with the details to be saved, then
         // call the viewModel's saveTask function to save it.
         // Task is now a data class, so we can compare the new details with the original task,
-        // and only if they ara different.
+        // and only save if they are different.
 
         val newTask = taskFromUI()
         if (newTask != task) {
@@ -109,7 +107,7 @@ class AddEditFragment : Fragment() {
 
         addedit_save.setOnClickListener{
             saveTask()
-            listener?.OnSaveClicked()
+            listener?.onSaveClicked()
         }
     }
 
@@ -136,7 +134,7 @@ class AddEditFragment : Fragment() {
      * activity.
      */
     interface OnSaveClicked {
-        fun OnSaveClicked()
+        fun onSaveClicked()
     }
 
     companion object {

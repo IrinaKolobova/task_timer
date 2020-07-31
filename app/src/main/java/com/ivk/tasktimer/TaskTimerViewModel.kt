@@ -56,9 +56,8 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
             val cursor = getApplication<Application>().contentResolver.query(
                 TasksContract.CONTENT_URI,
                 projection, null, null,
-                sortOrder
-            )
-            databaseCursor.postValue(cursor)
+                sortOrder)
+        databaseCursor.postValue(cursor)
         }
     }
 
@@ -77,13 +76,13 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
                     val uri = getApplication<Application>().contentResolver?.insert(TasksContract.CONTENT_URI, values)
                     if (uri != null) {
                         task.id = TasksContract.getId(uri)
-                        Log.d(TAG, "saveTAsk: new id is ${task.id}")
+                        Log.d(TAG, "saveTask: new id is ${task.id}")
                     }
                 }
             } else {
                 // task has an id, so we're updating
                 GlobalScope.launch {
-                    Log.d(TAG,"saveTAsk: updating task")
+                    Log.d(TAG, "saveTask: updating task")
                     getApplication<Application>().contentResolver?.update(TasksContract.buildUriFromId(task.id), values, null, null)
                 }
             }
@@ -114,7 +113,7 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
             saveTiming(timingRecord)
 
             if (task.id == timingRecord.taskId) {
-                // the current task was tapped a second time, stip timing
+                // the current task was tapped a second time, stop timing
                 currentTiming = null
             } else {
                 // a new task is being timed
@@ -149,7 +148,7 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
                     currentTiming.id = TimingsContract.getId(uri)
                 }
             } else {
-                getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.taskId), values, null, null)
+                getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.id), values, null, null)
             }
         }
     }
@@ -166,15 +165,16 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
             null)
 
         if (timingCursor != null && timingCursor.moveToFirst()) {
-            // We have an un_timed record
+            // We have an un-timed record
             val id = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TIMING_ID))
             val taskId = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_ID))
             val startTime = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.START_TIME))
-            val name = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_NAME))
+            val name = timingCursor.getString(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_NAME))
             timing = Timing(taskId, startTime, id)
 
             // Update the LiveData
-            taskTiming.value = name.toString()
+            taskTiming.value = name
+
         } else {
             // No timing record found with zero duration
             timing = null

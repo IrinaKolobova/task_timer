@@ -23,9 +23,10 @@ object TestData {
     private const val MAX_DURATION = SECS_IN_DAY / 6
 
     fun generateTestData(contentResolver: ContentResolver) {
+
         val projection = arrayOf(TasksContract.Columns.ID)
         val uri = TasksContract.CONTENT_URI
-        val cursor = contentResolver.query(uri, projection,null, null, null)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -33,7 +34,7 @@ object TestData {
 
                 val loopCount = LOWER_BOUND + getRandomInt(UPPER_BOUND - LOWER_BOUND)
                 for (i in 0 until loopCount) {
-                    // generate a random date/time
+                    // generate a random data/time
                     val randomDate = randomDateTime()
 
                     // generate a random duration between 0 and 4 hours

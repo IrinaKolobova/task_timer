@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.ivk.tasktimer.debug.TestData
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
 
@@ -28,8 +29,8 @@ class MainActivity : AppCompatActivity(),
                     MainActivityFragment.OnTaskEdit,
                     AppDialog.DialogEvents {
 
-    // Whether or not the activity is in 2-pane mode
-    // i.e. running in landscape, or on a tablet
+    // Whether or the activity is in 2-pane mode
+    // i.e. running in landscape, or on a tablet.
     private var mTwoPane = false
 
     // module scope because we need to dismiss it in onStop (e.g. when orientation changes) to avoid memory leaks
@@ -41,9 +42,10 @@ class MainActivity : AppCompatActivity(),
         Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(toolbar)
 
         mTwoPane = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        Log.d(TAG, "onCreate: twoPane is $mTwoPane")
 
         val fragment = findFragmentById(R.id.task_details_container)
         if (fragment != null) {
@@ -54,7 +56,7 @@ class MainActivity : AppCompatActivity(),
             mainFragment.view?.visibility = View.VISIBLE
         }
 
-        viewModel.timing.observe(this, Observer { timing ->
+        viewModel.timing.observe(this, Observer<String> { timing ->
             current_task.text = if (timing != null) {
                 getString(R.string.timing_message, timing)
             } else {
@@ -87,9 +89,8 @@ class MainActivity : AppCompatActivity(),
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
-
-    override fun OnSaveClicked() {
-        Log.d(TAG, "OnSaveClicked: called")
+    override fun onSaveClicked() {
+        Log.d(TAG, "onSaveClicked: called")
         removeEditPane(findFragmentById(R.id.task_details_container))
     }
 
@@ -111,7 +112,7 @@ class MainActivity : AppCompatActivity(),
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.menumain_addTask -> taskEditRequest(null)
-            R.id.menumain_showDurations -> startActivity(Intent(this, DurationsReport :: class.java))
+            R.id.menumain_showDurations -> startActivity(Intent(this, DurationsReport::class.java))
             R.id.menumain_settings -> {
                 val dialog = SettingsDialog()
                 dialog.show(supportFragmentManager, null)
@@ -152,6 +153,13 @@ class MainActivity : AppCompatActivity(),
         aboutDialog = builder.setView(messageView).create()
         aboutDialog?.setCanceledOnTouchOutside(true)
 
+        messageView.setOnClickListener {
+            Log.d(TAG, "Entering messageView.onClick")
+            if (aboutDialog != null && aboutDialog?.isShowing == true) {
+                aboutDialog?.dismiss()
+            }
+        }
+
         val aboutVersion = messageView.findViewById(R.id.about_version) as TextView
         aboutVersion.text = BuildConfig.VERSION_NAME
 
@@ -183,9 +191,8 @@ class MainActivity : AppCompatActivity(),
 //        supportFragmentManager.beginTransaction()
 //            .replace(R.id.task_details_container, newFragment)
 //            .commit()
-        replaceFragment(AddEditFragment.newInstance(task), R.id.task_details_container)
         showEditPane()
-
+        replaceFragment(AddEditFragment.newInstance(task), R.id.task_details_container)
         Log.d(TAG, "Exiting taskEditRequest")
     }
 

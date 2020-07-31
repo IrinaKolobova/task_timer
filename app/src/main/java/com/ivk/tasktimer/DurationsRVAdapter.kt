@@ -21,7 +21,7 @@ class DurationsRVAdapter(context: Context, private var cursor: Cursor?) : Recycl
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.task_durations_items, parent, false)
+                .inflate(R.layout.task_durations_items, parent,false)
 
         return ViewHolder(view)
     }
@@ -55,7 +55,7 @@ class DurationsRVAdapter(context: Context, private var cursor: Cursor?) : Recycl
 
     private fun formatDuration(duration: Long): String {
         // duration is in seconds, convert to hours:minutes:seconds
-        // (allowing for >24 hours = so we can't use a time data type);
+        // (allowing for >24 hours - so we can't use a time data type);
         val hours = duration / 3600
         val remainder = duration - hours * 3600
         val minutes = remainder / 60
@@ -66,7 +66,7 @@ class DurationsRVAdapter(context: Context, private var cursor: Cursor?) : Recycl
     }
 
     fun swapCursor(newCursor: Cursor?) : Cursor? {
-        if (newCursor == cursor) {
+        if (newCursor === cursor) {
             return null
         }
         val numItems = itemCount

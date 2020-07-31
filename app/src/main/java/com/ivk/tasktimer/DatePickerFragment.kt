@@ -24,16 +24,16 @@ class DatePickerFragment : AppCompatDialogFragment(), DatePickerDialog.OnDateSet
         val cal = GregorianCalendar()
         var title: String? = null
 
-        val arguments = arguments // avoid problems smart cast
+        val arguments = arguments // avoid problems with smart cast
         if (arguments != null) {
             dialogId = arguments.getInt(DATE_PICKER_ID)
             title = arguments.getString(DATE_PICKER_TITLE)
 
-            //  If we were passed a date, use it; otherwise live cal set to the current date.
+            //  If we were passed a date, use it; otherwise leave cal set to the current date.
             val givenDate = arguments.getSerializable(DATE_PICKER_DATE) as Date?
             if (givenDate != null) {
                 cal.time = givenDate
-                Log.d(TAG, "in onCreateDialog. retrieved date $givenDate")
+                Log.d(TAG, "in onCreateDialog, retrieved date $givenDate")
             }
         }
 
@@ -60,7 +60,7 @@ class DatePickerFragment : AppCompatDialogFragment(), DatePickerDialog.OnDateSet
     override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
         Log.d(TAG, "Entering onDateSet")
 
-        // Notify called of the user-selected values
+        // Notify caller of the user-selected values
         view.tag = dialogId // pass the id back in the tag, to save the caller storing their own copy
 
         (context as DatePickerDialog.OnDateSetListener?)?.onDateSet(view, year, month, dayOfMonth)
