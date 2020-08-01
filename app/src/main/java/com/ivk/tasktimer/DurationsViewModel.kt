@@ -9,6 +9,7 @@ import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -38,6 +39,9 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
 
     private var calendar = GregorianCalendar()
 
+    private val settings = PreferenceManager.getDefaultSharedPreferences(application)
+    private var firstDayOfWeek = settings.getInt(SETTINGS_FIRST_DAY_OF_WEEK, calendar.firstDayOfWeek)
+
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "broadcastReceiver.onReceive called. Intent is $intent")
@@ -46,6 +50,8 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
                 val currentTime = calendar.timeInMillis
                 calendar = GregorianCalendar()
                 calendar.timeInMillis = currentTime
+                Log.d(TAG, "DurationsViewModel: created. First day of week is $firstDayOfWeek")
+                calendar.firstDayOfWeek = firstDayOfWeek
                 applyFilter()
             }
         }
@@ -71,6 +77,9 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
     get() = _displayWeek
 
     init {
+        Log.d(TAG, "DurationsViewModel: created. First day of week is $firstDayOfWeek")
+        calendar.firstDayOfWeek = firstDayOfWeek
+
         application.contentResolver.registerContentObserver(TimingsContract.CONTENT_URI, true, contentObserver)
 
         val broadcastFilter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
