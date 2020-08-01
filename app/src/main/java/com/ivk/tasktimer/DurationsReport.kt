@@ -114,6 +114,9 @@ class DurationsReport : AppCompatActivity(),
         arguments.putInt(DATE_PICKER_ID, dialogId)
         arguments.putString(DATE_PICKER_TITLE, title)
         arguments.putSerializable(DATE_PICKER_DATE, viewModel.getFilterDate())
+
+        arguments.putInt(DATE_PICKER_FDOW, viewModel.firstDayOfWeek)
+        
         dialogFragment.arguments = arguments
         dialogFragment.show(supportFragmentManager, "datePicker")
     }

@@ -40,7 +40,10 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
     private var calendar = GregorianCalendar()
 
     private val settings = PreferenceManager.getDefaultSharedPreferences(application)
-    private var firstDayOfWeek = settings.getInt(SETTINGS_FIRST_DAY_OF_WEEK, calendar.firstDayOfWeek)
+    private var _firstDayOfWeek = settings.getInt(SETTINGS_FIRST_DAY_OF_WEEK, calendar.firstDayOfWeek)
+    val firstDayOfWeek
+        get() = _firstDayOfWeek
+
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -51,6 +54,7 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
                 calendar = GregorianCalendar()
                 calendar.timeInMillis = currentTime
                 Log.d(TAG, "DurationsViewModel: created. First day of week is $firstDayOfWeek")
+                _firstDayOfWeek = settings.getInt(SETTINGS_FIRST_DAY_OF_WEEK, calendar.firstDayOfWeek)
                 calendar.firstDayOfWeek = firstDayOfWeek
                 applyFilter()
             }
