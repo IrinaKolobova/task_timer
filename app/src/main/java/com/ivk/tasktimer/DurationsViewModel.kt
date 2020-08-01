@@ -1,10 +1,7 @@
 package com.ivk.tasktimer
 
 import android.app.Application
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
@@ -61,6 +58,18 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
         }
     }
 
+    private val settingsListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->  
+        when (key) {
+            SETTINGS_FIRST_DAY_OF_WEEK -> {
+                _firstDayOfWeek = sharedPreferences.getInt(key, calendar.firstDayOfWeek)
+                calendar.firstDayOfWeek = firstDayOfWeek
+                Log.d(TAG, "settingsListener: First day of week is $firstDayOfWeek")
+                // Now re-query the database
+                applyFilter()
+            }
+        }
+    }
+
     private val databaseCursor = MutableLiveData<Cursor>()
     val cursor: LiveData<Cursor>
         get() = databaseCursor
@@ -89,6 +98,8 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
         val broadcastFilter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
         broadcastFilter.addAction(Intent.ACTION_LOCALE_CHANGED)
         application.registerReceiver(broadcastReceiver, broadcastFilter)
+
+        settings.registerOnSharedPreferenceChangeListener(settingsListener)
 
         applyFilter()
 
@@ -206,5 +217,7 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
         Log.d(TAG, "onCleared: called")
         getApplication<Application>().contentResolver.unregisterContentObserver(contentObserver)
         getApplication<Application>().unregisterReceiver(broadcastReceiver)
+
+        settings.unregisterOnSharedPreferenceChangeListener(settingsListener)
     }
 }
