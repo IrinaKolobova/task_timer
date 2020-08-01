@@ -2,16 +2,19 @@ package com.ivk.tasktimer
 
 import android.app.Application
 import android.content.ContentValues
+import android.content.SharedPreferences
 import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.prefs.PreferenceChangeEvent
 
 private const val TAG = "TaskTimerViewModel"
 
@@ -21,10 +24,20 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
         override fun onChange(selfChange: Boolean, uri: Uri?) {
             Log.d(TAG, "contentObserver.onChange: called. uri is $uri")
             loadTasks()
-
         }
     }
 
+    private val settings = PreferenceManager.getDefaultSharedPreferences(application)
+    private var ignoreLessThan = settings.getInt(SETTINGS_IGNORE_LESS_THAN, SETTINGS_DEFAULT_IGNORE_LESS_THAN)
+
+    private val settingsListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+        when (key) {
+            SETTINGS_IGNORE_LESS_THAN -> {
+                ignoreLessThan = sharedPreferences.getInt(key, SETTINGS_DEFAULT_IGNORE_LESS_THAN)
+                Log.d(TAG, "settingsListener: now ignoring timings less than $ignoreLessThan seconds")
+            }
+        }
+    }
     private var currentTiming: Timing? = null
 
     private val databaseCursor = MutableLiveData<Cursor>()
@@ -39,6 +52,9 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
         Log.d(TAG, "TaskTimerViewModel: created")
         getApplication<Application>().contentResolver.registerContentObserver(TasksContract.CONTENT_URI,
                 true, contentObserver)
+
+        Log.d(TAG, "Ignoring timings less than $ignoreLessThan seconds")
+        settings.registerOnSharedPreferenceChangeListener(settingsListener)
 
         currentTiming = retrieveTiming()
         loadTasks()
@@ -148,7 +164,15 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
                     currentTiming.id = TimingsContract.getId(uri)
                 }
             } else {
-                getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.id), values, null, null)
+                // Only save if the duration is larger than than the value
+                if (currentTiming.duration >= ignoreLessThan) {
+                    Log.d(TAG, "saveTiming: saving timing which duration ${currentTiming.duration}")
+                    getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.id), values, null, null)
+                } else {
+                    // Too short to save, delete if instead
+                    Log.d(TAG, "saveTiming: deleting timing which duration ${currentTiming.duration}")
+                    getApplication<Application>().contentResolver.delete(TimingsContract.buildUriFromId(currentTiming.id), null, null)
+                }
             }
         }
     }
@@ -189,5 +213,7 @@ class TaskTimerViewModel(application: Application) : AndroidViewModel(applicatio
     override fun onCleared() {
         Log.d(TAG, "onCleared: called")
         getApplication<Application>().contentResolver.unregisterContentObserver(contentObserver)
+
+        settings.unregisterOnSharedPreferenceChangeListener(settingsListener)
     }
 }
