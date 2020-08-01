@@ -1,7 +1,14 @@
 package com.ivk.tasktimer
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.database.ContentObserver
 import android.database.Cursor
+import android.net.Uri
+import android.os.Handler
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -21,7 +28,28 @@ enum class SortColumns {
 
 class DurationsViewModel (application: Application) : AndroidViewModel(application){
 
-    private val calendar = GregorianCalendar()
+    private val contentObserver = object : ContentObserver(Handler()) {
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            Log.d(TAG, "contentObserver.onChange: called. uri is $uri")
+            loadData()
+
+        }
+    }
+
+    private var calendar = GregorianCalendar()
+
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d(TAG, "broadcastReceiver.onReceive called. Intent is $intent")
+            val action = intent?.action
+            if (action == Intent.ACTION_TIMEZONE_CHANGED || action == Intent.ACTION_LOCALE_CHANGED) {
+                val currentTime = calendar.timeInMillis
+                calendar = GregorianCalendar()
+                calendar.timeInMillis = currentTime
+                applyFilter()
+            }
+        }
+    }
 
     private val databaseCursor = MutableLiveData<Cursor>()
     val cursor: LiveData<Cursor>
@@ -43,7 +71,14 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
     get() = _displayWeek
 
     init {
+        application.contentResolver.registerContentObserver(TimingsContract.CONTENT_URI, true, contentObserver)
+
+        val broadcastFilter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
+        broadcastFilter.addAction(Intent.ACTION_LOCALE_CHANGED)
+        application.registerReceiver(broadcastReceiver, broadcastFilter)
+
         applyFilter()
+
     }
 
     fun toggleDisplayWeek() {
@@ -152,5 +187,11 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
         }
 
         Log.d(TAG, "Exiting deleteRecords")
+    }
+
+    override fun onCleared() {
+        Log.d(TAG, "onCleared: called")
+        getApplication<Application>().contentResolver.unregisterContentObserver(contentObserver)
+        getApplication<Application>().unregisterReceiver(broadcastReceiver)
     }
 }

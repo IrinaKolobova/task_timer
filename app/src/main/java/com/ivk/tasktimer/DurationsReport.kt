@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_durations_report.*
 import kotlinx.android.synthetic.main.task_durations.*
 import java.lang.IllegalArgumentException
@@ -39,7 +38,6 @@ class DurationsReport : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_durations_report)
         setSupportActionBar(toolbar)
-
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
